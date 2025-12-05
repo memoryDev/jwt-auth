@@ -1,0 +1,21 @@
+server:
+  port: 8888
+
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3308/jwt-auth?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
+    username: root
+    password: root1234
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      show_sql: true
+      format_sql: true
+
+
+# JWT TOKEN
+jwt:
+  secret: 33f22f84568c6a3c59e76856b644686255148b160fadc1ffeb1c95f3d63e10f8
