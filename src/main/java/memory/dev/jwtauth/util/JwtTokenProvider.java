@@ -29,14 +29,18 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
+    // DB에서 유저 정보를 가져오는 서비스
     private final CustomUserDetailService userDetailService;
 
-    private final long validityInMs = 1000L * 60 * 60; // 1시간
+    // 토큰 유효시간 (1시간)
+    private final long validityInMs = 1000L * 60 * 60;
 
+    // HMAC256 알고리즘 생성 (서명/검증에 사용)
     private Algorithm getAlgorithm() {
         return Algorithm.HMAC256(secretKey);
     }
 
+    // User 정보로 JWT 토큰 생성
     public String createToken(User user) {
 
         Date now = new Date();
@@ -51,6 +55,7 @@ public class JwtTokenProvider {
                 .sign(this.getAlgorithm());
     }
 
+    // HTTP 요청 헤더에서 토큰 추출
     public String resolveToken(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if (bearer != null && bearer.startsWith("Bearer ")) {
@@ -59,6 +64,7 @@ public class JwtTokenProvider {
         return null;
     }
 
+    // 토큰의 유효성 검사(서명 + 만료시간 확인)
     public boolean validateToken(String token) {
         try {
             DecodedJWT decoded = getDecoded(token);
@@ -71,6 +77,7 @@ public class JwtTokenProvider {
         }
     }
 
+    // 토큰에서 UserId 추출
     public String getUserId(String token) {
 
         DecodedJWT decoded = getDecoded(token);
@@ -79,9 +86,16 @@ public class JwtTokenProvider {
 
     }
 
+    // 토큰으로부터 Authentication 객체 생성(SecurityContext에 넣을 용도)
     public Authentication getAuthentication(String token) {
+
+        // 토큰에서 userId 조회
         String userId = getUserId(token);
+
+        // DB에서 유저 정보 조회
         UserDetails userDetails = userDetailService.loadUserByUsername(userId);
+
+        // 스프링 시큐리티에서 사용하는 인증 객체 생성
         return new UsernamePasswordAuthenticationToken(
                 userDetails,
                 null,
@@ -89,6 +103,7 @@ public class JwtTokenProvider {
         );
     }
 
+    // 토큰을 검증하고 디코딩된 JWT 객체 반환
     private DecodedJWT getDecoded(String token) {
         JWTVerifier verifier = JWT.require(getAlgorithm())
                 .build();
