@@ -1,6 +1,7 @@
 package memory.dev.jwtauth.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import memory.dev.jwtauth.filter.JwtAuthenticationFilter;
 import memory.dev.jwtauth.user.controller.CustomUserDetailService;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration // 설정 클래스
 @EnableWebSecurity // Spring Security 활성화
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
     // JWT 토큰을 검증해서 인증 정보를 SecurityContext에 넣어주는 필터
@@ -29,6 +31,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        log.info("===== filterChain start =====");
         http
 
                 // CSRF 비활성화 (JWT 사용시 주로 비활성화)
@@ -45,7 +48,6 @@ public class SecurityConfig {
                         .permitAll()
                         // 나머지 모든 요청은 인증 필요
                         .anyRequest().authenticated()
-
                 )
 
                 // 인증 시 사용할 UserDetailsService 지정

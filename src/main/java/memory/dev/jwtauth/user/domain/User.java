@@ -2,6 +2,7 @@ package memory.dev.jwtauth.user.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User implements UserDetails {
@@ -32,6 +34,15 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private String role = "ROLE_USER";
+
+    //테스트에서 사용할 생성자 역할
+    @Builder
+    private User(String userId, String password, String userName, String role) {
+        this.userId = userId;
+        this.password = password;
+        this.userName = userName;
+        this.role = role;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
