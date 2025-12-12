@@ -26,8 +26,25 @@
             const userId = form.userId.value;
             const password = form.password.value;
 
+            resultDiv.innerText = '';
+
             try {
-                const res = await fetch('')
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, password })
+                })
+
+               const data = await res.json();
+
+                if (!res.ok) {
+                    resultDiv.innerText = data.message;
+                    return;
+                }
+
+                // 로그인 성공
+                const accessToken = data.accessToken;
+                localStorage.setItem('accessToken', accessToken);
 
             } catch (error) {
                 console.error(error);
