@@ -31,7 +31,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        log.info("===== filterChain start =====");
         http
 
                 // CSRF 비활성화 (JWT 사용시 주로 비활성화)

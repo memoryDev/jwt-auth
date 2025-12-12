@@ -2,6 +2,8 @@ package memory.dev.jwtauth.auth.service;
 
 import memory.dev.jwtauth.auth.dto.LoginRequest;
 import memory.dev.jwtauth.auth.dto.TokenResponse;
+import memory.dev.jwtauth.global.error.BusinessException;
+import memory.dev.jwtauth.global.error.ErrorCode;
 import memory.dev.jwtauth.user.domain.User;
 import memory.dev.jwtauth.user.repository.UserRepository;
 import memory.dev.jwtauth.util.JwtTokenProvider;
@@ -151,7 +153,7 @@ class AuthServiceTest {
         );
 
         // 로그인시 예외발생한 메세지로 예외 던지는지 체크
-        Assertions.assertEquals("비밀번호가 존재하지 않습니다.", runtimeException.getMessage());
+        Assertions.assertEquals(ErrorCode.INVALID_PASSWORD.getMessage(), runtimeException.getMessage());
 
         // 비밀번호는 다르지만 회원정보 호출 했는지 검증
         Mockito.verify(userRepository).findByUserId(userId);
@@ -159,6 +161,42 @@ class AuthServiceTest {
         // 비밀번호가 다르기 때문에 토큰 생성 로직은 호출 되면 안됨
         Mockito.verify(jwtTokenProvider, Mockito.never())
                 .createToken(Mockito.any(User.class));
+    }
+
+    @Test
+    void 로그인_성공했지만_토큰_생성_못했을경우() {
+
+        String userId = "test1"; // 로그인 유저아이디
+        String rawPassword = "1234"; // 잘못된 로그인 비밀번호
+        String encodedPassword = "$2b$12$fB6vqSY9ff8dPc6RSh32LO.uoDCGhgnTq0/xXZ5TRvlqqCeujXsMG"; // DB에 저장된 암호화된 비밀번호
+        String userName = "테스트1";
+        String role = "ROLE_USER";
+
+        User user = User.builder()
+                .userId(userId)
+                .password(encodedPassword)
+                .userName(userName)
+                .role(role)
+                .build();
+
+        LoginRequest request = new LoginRequest(userId, rawPassword);
+
+        Mockito.when(userRepository.findByUserId(userId))
+                .thenReturn(Optional.of(user));
+
+        Mockito.when(passwordEncoder.matches(rawPassword, encodedPassword))
+                .thenReturn(true);
+
+        Mockito.when(jwtTokenProvider.createToken(user))
+                .thenReturn(null);
+
+        Assertions.assertThrows(BusinessException.class,
+                () -> authService.login(request)
+        );
+
+        Mockito.verify(userRepository).findByUserId(userId);
+        Mockito.verify(passwordEncoder).matches(rawPassword, encodedPassword);
+
     }
 
 }
