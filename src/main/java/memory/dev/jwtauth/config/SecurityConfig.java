@@ -3,7 +3,7 @@ package memory.dev.jwtauth.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import memory.dev.jwtauth.filter.JwtAuthenticationFilter;
-import memory.dev.jwtauth.user.controller.CustomUserDetailService;
+import memory.dev.jwtauth.user.service.CustomUserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,7 +43,7 @@ public class SecurityConfig {
 
                 // URL 별 인가(접근 권한) 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/api/login", "/api/signup"
+                        .requestMatchers("/login", "/api/auth/login", "/api/signup"
                         , "/css/**", "/js/**", "/images/**")
                         .permitAll()
                         // 나머지 모든 요청은 인증 필요
