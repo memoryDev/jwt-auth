@@ -42,7 +42,7 @@ public class SecurityConfig {
 
                 // URL 별 인가(접근 권한) 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/api/auth/login", "/api/signup"
+                        .requestMatchers("/login", "/api/auth/login", "/api/auth/signup"
                         , "/css/**", "/js/**", "/images/**")
                         .permitAll()
                         // 나머지 모든 요청은 인증 필요
